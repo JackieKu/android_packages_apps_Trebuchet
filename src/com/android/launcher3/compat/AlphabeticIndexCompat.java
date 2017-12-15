@@ -2,6 +2,7 @@ package com.android.launcher3.compat;
 
 import android.content.Context;
 import android.icu.text.AlphabeticIndex;
+import android.os.LocaleList;
 
 import com.android.launcher3.Utilities;
 
@@ -15,8 +16,12 @@ public class AlphabeticIndexCompat {
     private String mDefaultMiscLabel;
 
     public AlphabeticIndexCompat(Context context) {
-        Locale curLocale = context.getResources().getConfiguration().getLocales().get(0);
-        mAlphabeticIndex = new AlphabeticIndex(curLocale).buildImmutableIndex();
+        LocaleList locales = context.getResources().getConfiguration().getLocales();
+        Locale curLocale = locales.get(0);
+        AlphabeticIndex indexBuilder = new AlphabeticIndex(curLocale);
+        for (int i = 1; i < locales.size(); ++i)
+            indexBuilder.addLabels(locales.get(i));
+        mAlphabeticIndex = indexBuilder.buildImmutableIndex();
         if (curLocale.getLanguage().equals(Locale.JAPANESE.getLanguage())) {
             // Japanese character 他 ("misc")
             mDefaultMiscLabel = "\u4ed6";
